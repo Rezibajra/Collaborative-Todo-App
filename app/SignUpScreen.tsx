@@ -1,6 +1,23 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Pressable } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, Pressable, ActivityIndicator, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
+import { client } from '../apollo';
+
+import { useMutation, gql } from "@apollo/client";
+
+const SIGN_UP_MUTATION = gql`
+mutation signUp($email: String!, $password: String!, $name: String!) {
+  signUp(input: {email: $email, password: $password, name: $name}){
+    token
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+`;
 
 const SignUpScreen = () => {
     const [email, setEmail] = useState('');
@@ -9,8 +26,22 @@ const SignUpScreen = () => {
 
     const navigation = useNavigation();
 
-    const onSubmit = () => {
+    const [signUp, {data, error, loading}] = useMutation(SIGN_UP_MUTATION);
+    
+    if (error) {
+        Alert.alert('Error signing up. Try again.')
+    }
+    
+    if (data) {
+        AsyncStorage
+            .setItem('token', data.signUp.token)
+            .then(() => {
+                navigation.navigate('ProjectsScreen')
+            })
+    }
 
+    const onSubmit = () => {
+        signUp({variables: { name, email, password }})
     }
 
     return (
@@ -50,15 +81,17 @@ const SignUpScreen = () => {
                 }}
             />
 
-            <Pressable onPress={onSubmit} 
+            <Pressable disabled={loading} onPress={onSubmit} 
                 style={{
                     backgroundColor: '#e33062',
                     height: 50,
                     borderRadius: 5,
                     alignItems: 'center',
+                    flexDirection: 'row',
                     justifyContent: 'center',
                     marginTop: 20,
                 }}>
+                    {loading && <ActivityIndicator />}
                 <Text 
                     style={{
                         color: 'white',
@@ -67,7 +100,7 @@ const SignUpScreen = () => {
                     }}>Sign Up</Text>
             </Pressable>
 
-            <Pressable onPress={() => navigation.navigate('index')} 
+            <Pressable disabled={loading} onPress={() => navigation.navigate('index')} 
                 style={{
                     height: 50,
                     borderRadius: 5,
@@ -75,6 +108,7 @@ const SignUpScreen = () => {
                     justifyContent: 'center',
                     marginTop: 20,
                 }}>
+                    {loading && <ActivityIndicator />}
                 <Text 
                     style={{
                         color: '#e33062',

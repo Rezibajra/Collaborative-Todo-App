@@ -18,6 +18,8 @@
     "@apollo/client": "^3.11.10",
     "@expo/metro-runtime": "^4.0.0",
     "@expo/vector-icons": "^14.0.4",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-navigation/native": "^6.1.18",
     "expo": "~51.0.22",
     "expo-constants": "~16.0.2",
