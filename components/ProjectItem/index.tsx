@@ -22,11 +22,10 @@ const ProjectItem = ({ project }: ProjectItemProps) => {
   return (
     <Pressable onPress={onPress} style={styles.root}>
       <View style={styles.iconContainer}>
-        <MaterialCommunityIcons name="file-outline" size={24} color="grey" />
+        <MaterialCommunityIcons name="folder-outline" size={24} color="white" />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={styles.title}>{project.title}</Text>
-        <Text style={styles.time}>{project.createdAt}</Text>
       </View>
     </Pressable>
   )

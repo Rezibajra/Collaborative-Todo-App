@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
 import ProjectItem from '../components/ProjectItem';
 import { Text, View } from '@/components/Themed';
 import { useTheme } from '@react-navigation/native';
 import { useQuery , gql} from '@apollo/client';
+import FloatingButton from '../components/FloatingButton';
 
 const MY_PROJECTS = gql `
 query myTaskLists {
@@ -39,6 +40,9 @@ export default function ProjectsScreen() {
           renderItem={({item}) => <ProjectItem project={item} />}
           style={{ width: '100%' }}
         />
+        <FloatingButton 
+          icon = "folder-plus"
+        />
       </View>
   );
 }
@@ -72,6 +76,10 @@ const styles = StyleSheet.create({
   },
   time: {
     color: 'darkgrey',
-
+  },
+  floatinBtn: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
   }
 });

@@ -12,7 +12,7 @@ const Checkbox = (props: CheckBoxProps) => {
     const name = isChecked ? 'checkbox-marked-outline' : 'checkbox-blank-outline'
     return (
         <Pressable onPress={onPress}>
-            <MaterialCommunityIcons name={name} size={24} color="black" />
+            <MaterialCommunityIcons name={name} size={24} color="#e33062" />
         </Pressable>
     )
 }

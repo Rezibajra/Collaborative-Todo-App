@@ -5,6 +5,7 @@ import { useMutation, gql, useQuery } from "@apollo/client";
 import { useRoute } from '@react-navigation/native';
 import ToDoItem from '../components/ToDoItem';
 import { useTheme } from '@react-navigation/native';
+import FloatingButton from '../components/FloatingButton';
 
 const GET_PROJECT = gql`
 query getTasklist($id:ID!) {
@@ -112,6 +113,9 @@ export default function ToDoScreen() {
             />
             )}
             style={{ width: '100%'}}
+        />
+        <FloatingButton 
+          icon = "account-plus"
         />
       </View>
     // </KeyboardAvoidingView>

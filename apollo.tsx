@@ -1,7 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from '@apollo/client/link/context';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const URI = 'https://ec60-2404-7c00-41-4fb4-4c1e-2340-7377-6ae.ngrok-free.app'
+const URI = 'https://24d7-2404-7c00-41-311e-ef3e-fd0e-3682-c241.ngrok-free.app'
 
 const httpLink = createHttpLink({
     uri: URI,
@@ -19,5 +19,10 @@ const authLink = setContext(async (_, { headers }) => {
 
 export const client = new ApolloClient({
     link: authLink.concat(httpLink),
-    cache: new InMemoryCache()
+    cache: new InMemoryCache({
+        possibleTypes: {  // Optionally, use `possibleTypes` for union/fragment matching
+            MyUnionType: ['TypeA', 'TypeB'],
+            MyInterfaceType: ['TypeA', 'TypeB'],
+          }
+})
 });
