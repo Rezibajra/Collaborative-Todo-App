@@ -6,6 +6,7 @@ import { useRoute } from '@react-navigation/native';
 import ToDoItem from '../components/ToDoItem';
 import { useTheme } from '@react-navigation/native';
 import FloatingButton from '../components/FloatingButton';
+import { useLocalSearchParams } from 'expo-router';
 
 const GET_PROJECT = gql`
 query getTasklist($id:ID!) {
@@ -47,9 +48,10 @@ export default function ToDoScreen() {
   const { colors } = useTheme();
   const [project, setProject] = useState(null);
   const [title, setTitle] = useState('');
+  const { taskId } = useLocalSearchParams();
 
-  const route = useRoute();
-  const id = route.params.id;
+  // const route = useRoute();
+  const id = taskId;
 
   const { data, error, loading } = useQuery(GET_PROJECT, { variables: { id }})
 
@@ -59,7 +61,7 @@ export default function ToDoScreen() {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Error fetching project', error.message);
+      console.log('Error fetching project');
     }
   }, [error]);
 
@@ -77,13 +79,6 @@ export default function ToDoScreen() {
         taskListId: id,
       }
     })
-    // const newTodos = [...todos];
-    // newTodos.splice(atIndex, 0, {
-    //   id: id,
-    //   content: '',
-    //   isCompleted: false
-    // })
-    // setTodos(newTodos);
   }
 
   if (!project) {
@@ -91,11 +86,6 @@ export default function ToDoScreen() {
   }
 
   return (
-    // <KeyboardAvoidingView 
-    //   behavior={Platform.OS === "ios" ? "padding": "height"}
-    //   keyboardVerticalOffset={Platform.OS === 'ios' ? 130 : 130}
-    //   style={{ flex:1 }}
-    //   >
       <View style={styles.container}>
         <TextInput 
           value={title}
@@ -116,9 +106,9 @@ export default function ToDoScreen() {
         />
         <FloatingButton 
           icon = "account-plus"
+          project_id = {id}
         />
       </View>
-    // </KeyboardAvoidingView>
   );
 }
 

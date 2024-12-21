@@ -23,7 +23,7 @@ export default function ProjectsScreen() {
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Error fetching projects', error.message);
+      console.log('Error fetching projects');
     }
   }, [error])
 
@@ -42,6 +42,7 @@ export default function ProjectsScreen() {
         />
         <FloatingButton 
           icon = "folder-plus"
+          project_id=''
         />
       </View>
   );
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   title: {
-    // width: '100%',
     fontSize: 20,
     color: 'black',
     fontWeight: 'bold',

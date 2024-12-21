@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, Pressable } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import styles from './styles';
 
 interface ProjectItemProps {
@@ -14,9 +15,11 @@ interface ProjectItemProps {
 
 const ProjectItem = ({ project }: ProjectItemProps) => {
   const navigation = useNavigation();
+  const router = useRouter();
 
   const onPress = () => {
-    navigation.navigate('ToDoScreen', { id: project.id })
+    router.push(`/ToDoScreen?taskId=${project.id}`);
+    // navigation.navigate('ToDoScreen', { id: project.id })
   }
   
   return (

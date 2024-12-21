@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, StyleSheet, Image } from 'react-native';
+import { View, Text, Pressable, Alert, StyleSheet, Image } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import { useQuery , gql} from '@apollo/client';
+import { useQuery , gql, useApolloClient } from '@apollo/client';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwtDecode from 'jwt-decode';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const CURRENT_USER = gql `
 query getUserProfile {
@@ -17,8 +17,23 @@ query getUserProfile {
 `;
 
 export default function UserProfileScreen() {
-
+    const navigation = useNavigation();
     const { data, error, loading } = useQuery(CURRENT_USER);
+    const client = useApolloClient();
+
+    const handleLogout = async () => {
+      try {
+        if (data) {
+          await AsyncStorage.removeItem('token');
+          await client.clearStore();  // Clears the Apollo client cache
+          client.resetStore();
+          navigation.navigate('SignInScreen');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Failed to logout. Please try again.');
+        console.error('Logout error:', error);
+      }
+    };
 
     useEffect(() => {
         if (error) {
@@ -47,12 +62,6 @@ export default function UserProfileScreen() {
 
     const user = data.getUserProfile;
 
-    // const user = {
-    //     name: 'John Doe',
-    //     avatar: 'https://www.w3schools.com/howto/img_avatar.png', // Replace with a real image URL
-    //     email: 'johndoe@example.com',
-    // };
-
     return (
         <View style={styles.outerContainer}>
             <View style={styles.container}>
@@ -64,6 +73,13 @@ export default function UserProfileScreen() {
 
                 {/* Email */}
                 <Text style={styles.email}>{user.email}</Text>
+                <Pressable
+                    style={styles.logoutRow}
+                    onPress={handleLogout}
+                  >
+                    <MaterialCommunityIcons name="logout" size={24} color="#e33062" />
+                    <Text style={styles.logoutText}>Logout</Text>
+                  </Pressable>
             </View>
         </View>
     )
@@ -98,5 +114,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#777', // Lighter color for the email
         marginBottom: 20, // Space below the email
+      },
+      logoutRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 20,
+        padding: 10,
+      },
+      logoutText: {
+        marginLeft: 8,
+        fontSize: 16,
+        color: '#e33062',
+        fontWeight: '500',
       },
   });

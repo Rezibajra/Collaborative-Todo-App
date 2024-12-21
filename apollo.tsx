@@ -19,10 +19,5 @@ const authLink = setContext(async (_, { headers }) => {
 
 export const client = new ApolloClient({
     link: authLink.concat(httpLink),
-    cache: new InMemoryCache({
-        possibleTypes: {  // Optionally, use `possibleTypes` for union/fragment matching
-            MyUnionType: ['TypeA', 'TypeB'],
-            MyInterfaceType: ['TypeA', 'TypeB'],
-          }
-})
+    cache: new InMemoryCache()
 });

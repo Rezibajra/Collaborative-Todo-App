@@ -3,18 +3,28 @@ import { View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 interface FloatingButtonProps {
   icon: any,
+  project_id: string
 }
 
 const FloatingButton = (props: FloatingButtonProps) => {
   const navigation = useNavigation();
+  const router = useRouter();
+  
   const onPress = () => {
     navigation.navigate('AddProjectsScreen')
   }
+
+  const onAccountPress = () => {
+    router.push(`/AddUserScreen?taskId=${props.project_id}`);
+    // navigation.navigate('AddUserScreen', { taskId: props.project_id })
+  }
+
   return (
-    <TouchableOpacity onPress={onPress} style={styles.floatinBtn}>
+    <TouchableOpacity onPress={props.icon === 'account-plus' ? onAccountPress: onPress} style={styles.floatinBtn}>
       <View
         style={{
           backgroundColor: '#e33062',

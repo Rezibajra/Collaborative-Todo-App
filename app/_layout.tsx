@@ -19,8 +19,9 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen name="ToDoScreen" options={{ title:"ToDo", headerShown: true, headerTitleAlign: "center" }} />
+        <Stack.Screen name="AddUserScreen" options={{ title:"Add User", headerShown: true, headerTitleAlign: "center" }} />
         <Stack.Screen name="UserProfileScreen" options={{ title:"User Profile", headerShown: true, headerTitleAlign: "center" }} />
-        <Stack.Screen name="AddProjectsScreen" options={{ title:"Add Projects", headerShown: true, headerTitleAlign: "center" }} />
+        <Stack.Screen name="AddProjectsScreen" options={{ title:"Add Project", headerShown: true, headerTitleAlign: "center" }} />
         {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
       </Stack>
     </ApolloProvider>

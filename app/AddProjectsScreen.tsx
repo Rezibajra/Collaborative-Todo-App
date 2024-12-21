@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Pressable, Alert } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { useMutation, gql } from "@apollo/client";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CREATE_TASKLIST_MUTATION = gql`
 mutation createTaskList($title: String!) {
@@ -30,12 +29,27 @@ query myTaskLists {
 }
 `;
 
+const CREATE_TODO_MUTATION = gql`
+mutation createTodoList($content: String!, $taskListId: ID!) {
+  createToDo(content: $content, taskListId: $taskListId) {
+    id
+    content
+    isCompleted
+    taskList {
+      id
+      progress
+    }
+  }
+}
+`;
+
 const AddProjectsScreen = () => {
     const [title, setTitle] = useState('')
 
     const navigation = useNavigation();
 
     const [createTaskList, {data, error, loading }] = useMutation(CREATE_TASKLIST_MUTATION, {refetchQueries: [{ query: MY_PROJECTS }]});
+    const [createToDo] = useMutation(CREATE_TODO_MUTATION);
 
     useEffect(() => {
         if (error) {
@@ -45,33 +59,15 @@ const AddProjectsScreen = () => {
 
     useEffect(() => {
         if (data) {
+            createToDo({
+                variables: {
+                    content: "Edit me !!", // or any default content
+                    taskListId: data.createTaskList.id,
+                }
+            });
             navigation.navigate('ProjectsScreen')
         }
     }, [data])
-    
-    // if (data) {
-        // AsyncStorage
-        //     .setItem('token', data.signIn.token)
-        //     .then(() => {
-        //         navigation.navigate('ProjectsScreen')
-        //     })
-        // setProject(data.getTaskList);
-        //   setTitle(data.getTaskList.title);
-    // }
-
-    // useEffect(() => {
-    //     // Simulating fetching data and then updating state
-    //     fetchProjects().then(newProjects => {
-    //       setProjects(newProjects); // Safe to call here
-    //     });
-    // }, []);
-
-    // useEffect(() => {
-    //     if (data) {
-    //       setProject(data.getTaskList);
-    //       setTitle(data.getTaskList.title);
-    //     }
-    //   }, [data]);
     
     const onSubmit = () => {    
         createTaskList({ variables: { title }})

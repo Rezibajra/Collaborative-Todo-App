@@ -17,6 +17,16 @@ mutation signIn($email: String!, $password: String!) {
 }
 `;
 
+const MY_PROJECTS = gql `
+query myTaskLists {
+  myTaskLists {
+    id
+    title
+    createdAt
+  }
+}
+`;
+
 const SignInScreen = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -31,13 +41,15 @@ const SignInScreen = () => {
         }
     }, [error])
     
-    if (data) {
-        AsyncStorage
-            .setItem('token', data.signIn.token)
-            .then(() => {
-                navigation.navigate('ProjectsScreen')
-            })
-    }
+    useEffect(() => {
+        if (data) {
+            AsyncStorage
+                .setItem('token', data.signIn.token)
+                .then(() => {
+                    navigation.navigate('ProjectsScreen')
+                })
+        }
+    }, [data])
     
     const onSubmit = () => {    
         signIn({ variables: { email, password }})

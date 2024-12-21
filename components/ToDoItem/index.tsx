@@ -85,7 +85,7 @@ const ToDoItem = ({ todo, onSubmit }: ToDoItemProps) => {
                     id: todo.id,
                 }
             })
-            callUpdateItem();
+            // callUpdateItem();
         }
     }
 
