@@ -61,7 +61,7 @@ const AddUserScreen = () => {
         })
           .then(response => {
             Alert.alert('User added to task list successfully!');
-            navigation.navigate('ToDoScreen')
+            // navigation.navigate('ToDoScreen')
           })
           .catch(err => {
             Alert.alert('Error adding user to task list.');

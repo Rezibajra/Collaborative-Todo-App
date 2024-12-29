@@ -61,7 +61,7 @@ const AddProjectsScreen = () => {
         if (data) {
             createToDo({
                 variables: {
-                    content: "Edit me !!", // or any default content
+                    content: '', // or any default content
                     taskListId: data.createTaskList.id,
                 }
             });

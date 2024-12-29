@@ -35,8 +35,9 @@ interface ToDoItemProps {
         isCompleted: boolean;
     },
     onSubmit: () => void
+    onDelete: (id: string) => void;
 }
-const ToDoItem = ({ todo, onSubmit }: ToDoItemProps) => {
+const ToDoItem = ({ todo, onSubmit, onDelete }: ToDoItemProps) => {
     const [isChecked, setIsChecked] = useState(false);
     const [content, setContent] = useState('');
 
@@ -85,6 +86,7 @@ const ToDoItem = ({ todo, onSubmit }: ToDoItemProps) => {
                     id: todo.id,
                 }
             })
+            onDelete(todo.id);
             // callUpdateItem();
         }
     }

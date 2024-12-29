@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, FlatList, TextInput, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useMutation, gql, useQuery } from "@apollo/client";
 import { useRoute } from '@react-navigation/native';
 import ToDoItem from '../components/ToDoItem';
 import { useTheme } from '@react-navigation/native';
 import FloatingButton from '../components/FloatingButton';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 const GET_PROJECT = gql`
 query getTasklist($id:ID!) {
@@ -44,6 +44,30 @@ mutation createTodo($content: String!, $taskListId: ID!) {
 
 let id = '4'
 
+export const useRefetchOnFocus = (refetch: () => Promise<any>) => {
+  const [isRefetching, setIsRefetching] = useState(false);
+
+  // Refetch data when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        setIsRefetching(true); // Start refetching
+        try {
+          await refetch(); // Wait for refetch to complete
+        } catch (error) {
+          console.error("Error refetching data:", error);
+        } finally {
+          setIsRefetching(false); // End refetching
+        }
+      };
+      
+      fetchData();
+    }, [refetch])
+  );
+
+  return isRefetching; // Return whether the refetch is still in progress
+};
+
 export default function ToDoScreen() {
   const { colors } = useTheme();
   const [project, setProject] = useState(null);
@@ -53,24 +77,51 @@ export default function ToDoScreen() {
   // const route = useRoute();
   const id = taskId;
 
-  const { data, error, loading } = useQuery(GET_PROJECT, { variables: { id }})
+  const { data, error, loading, refetch } = useQuery(GET_PROJECT, { variables: { id }})
+
+  // State to track if refetch has completed
+  const [refetchCompleted, setRefetchCompleted] = useState(false);
+
+  // Use custom hook to trigger refetch when screen is focused
+  const isRefetching = useRefetchOnFocus(refetch);
+
+  // const { data, error, loading } = useQuery(GET_PROJECT, { variables: { id }})
 
   const [
     createToDo, { data: createTodoData, error: createTodoError }
-  ] = useMutation(CREATE_TODO, { refetchQueries: GET_PROJECT });
+  ] = useMutation(CREATE_TODO, {refetchQueries: [{ query: GET_PROJECT }]});
+  
+  // const [createDefaultToDo] = useMutation(CREATE_DEFAULT_TODO_MUTATION);
 
-  useEffect(() => {
-    if (error) {
-      console.log('Error fetching project');
-    }
-  }, [error]);
-
+  
   useEffect(() => {
     if (data) {
       setProject(data.getTaskList);
       setTitle(data.getTaskList.title);
+      setRefetchCompleted(true);
     }
   }, [data]);
+  
+  useEffect(() => {
+    if (error) {
+      console.log('Error fetching project', error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (refetchCompleted && project && project.todos.length === 0) {
+      createToDo({
+        variables: {
+          content: '',
+          taskListId: id,
+        }
+      }).then(() => {
+        console.log('Default empty todo created');
+      }).catch((err) => {
+        console.error('Error creating default todo:', err);
+      });
+    }
+  }, [refetchCompleted, project, createToDo, id]);
 
   const createNewItem = (atIndex:number) => {
     createToDo({
@@ -79,6 +130,23 @@ export default function ToDoScreen() {
         taskListId: id,
       }
     })
+  }
+
+  const handleDeleteTodo = (deletedTodoId: string) => {
+    if (project && project.todos) {  // Make sure project and todos are valid
+      setProject((prevProject) => ({
+        ...prevProject,  // Spread the previous project object
+        todos: prevProject.todos.filter(todo => todo.id !== deletedTodoId),  // Remove the deleted todo
+      }));
+    }
+  };
+
+  if (loading || isRefetching || !refetchCompleted) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#e33062" />
+      </View>
+    );
   }
 
   if (!project) {
@@ -100,6 +168,7 @@ export default function ToDoScreen() {
             <ToDoItem 
               todo={item} 
               onSubmit={() => createNewItem(index+1)}
+              onDelete={handleDeleteTodo}
             />
             )}
             style={{ width: '100%'}}
@@ -124,5 +193,10 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     marginBottom: 12,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
